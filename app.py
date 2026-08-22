@@ -40,12 +40,27 @@ def init_chromadb():
     """
     Initialize ChromaDB (cached - runs once)
     """
+    from langchain_community.document_loaders import DirectoryLoader, TextLoader
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+
     chroma_client = chromadb.PersistentClient(path='./chroma_db')
     gemini_ef = GeminiEmbeddingFunction()
-    collection = chroma_client.get_collection(
+    collection = chroma_client.get_or_create_collection(
         name='company_docs',
         embedding_function=gemini_ef
     )
+
+    if collection.count() == 0:
+        loader = DirectoryLoader('company_docs/', glob='*.txt', loader_cls=TextLoader)
+        documents = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        chunks = text_splitter.split_documents(documents)
+        collection.add(
+            documents=[chunk.page_content for chunk in chunks],
+            ids=[f'doc_{i}' for i in range(len(chunks))],
+            metadatas=[{'source': chunk.metadata.get('source', 'unknown')} for chunk in chunks]
+        )
+
     return collection
 
 collection = init_chromadb()
