@@ -20,7 +20,8 @@ st.title('🤖 Company Knowledge Assistant')
 st.markdown('Ask me anything about company policies!')
 
 # Gemini client
-client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+api_key = st.secrets.get('GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+client = genai.Client(api_key=api_key)
 
 def get_embedding(text):
     response = client.models.embed_content(
