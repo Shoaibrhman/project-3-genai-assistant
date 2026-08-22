@@ -21,6 +21,7 @@ st.markdown('Ask me anything about company policies!')
 
 # Gemini client
 api_key = st.secrets.get('GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+st.write(f"DEBUG - Key loaded: {api_key[:8]}...{api_key[-4:] if api_key else 'NONE'} (length: {len(api_key) if api_key else 0})")
 client = genai.Client(api_key=api_key)
 
 def get_embedding(text):
