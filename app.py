@@ -19,10 +19,31 @@ st.set_page_config(
 st.title('🤖 Company Knowledge Assistant')
 st.markdown('Ask me anything about company policies!')
 
-# Gemini client
-api_key = st.secrets.get('GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
-st.write(f"DEBUG - Key loaded: {api_key[:8]}...{api_key[-4:] if api_key else 'NONE'} (length: {len(api_key) if api_key else 0})")
-client = genai.Client(api_key=api_key)
+
+# Gemini client (Vertex AI mode)
+# Gemini client (Vertex AI mode)
+if 'gcp_service_account' in st.secrets:
+    import json
+    from google.oauth2 import service_account
+    credentials_info = dict(st.secrets['gcp_service_account'])
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_info,
+        scopes=['https://www.googleapis.com/auth/cloud-platform']
+    )
+    client = genai.Client(
+        vertexai=True,
+        project='ai-workshop-474409',
+        location='us-central1',
+        credentials=credentials
+    )
+else:
+    client = genai.Client(
+        vertexai=True,
+        project='ai-workshop-474409',
+        location='us-central1'
+    )
+)
+
 
 def get_embedding(text):
     response = client.models.embed_content(
@@ -91,7 +112,7 @@ Question: {query}
 Answer:'''
         
         response = client.models.generate_content(
-            model='gemini-3.6-flash',
+            model='gemini-2.5-flash',
             contents=prompt
         )
         return response.text
