@@ -1,4 +1,4 @@
-import streamlit as st
+\import streamlit as st
 import os
 from google import genai
 from chromadb import Documents, EmbeddingFunction, Embeddings
@@ -19,11 +19,8 @@ st.set_page_config(
 st.title('🤖 Company Knowledge Assistant')
 st.markdown('Ask me anything about company policies!')
 
-
-# Gemini client (Vertex AI mode)
 # Gemini client (Vertex AI mode)
 if 'gcp_service_account' in st.secrets:
-    import json
     from google.oauth2 import service_account
     credentials_info = dict(st.secrets['gcp_service_account'])
     credentials = service_account.Credentials.from_service_account_info(
@@ -42,8 +39,6 @@ else:
         project='ai-workshop-474409',
         location='us-central1'
     )
-)
-
 
 def get_embedding(text):
     response = client.models.embed_content(
